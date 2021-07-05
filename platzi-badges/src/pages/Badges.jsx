@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 
 import './styles/Badges.css';
 import confLogo from '../images/badge-header.svg';
-import BadgesList from '../components/BadgesList.jsx';
+import '../components/styles/BadgesList.css';
+/* import BadgesList from '../components/BadgesList.jsx'; */
 
 class Badges extends React.Component {
 
@@ -13,14 +14,19 @@ class Badges extends React.Component {
     console.log(`1. Contructor`);
 
     this.state = {
-      data: [],
+      nextPage: 1,
+      loading:true,
+      error: null,
+      data: {
+        results: [],
+      },
     };
   }
 
   componentDidMount() {
     console.log(`3. componentDidMount()`);
-
-    this.timeOutId = setTimeout(() => {
+    this.fetchCharacters();
+    /* this.timeOutId = setTimeout(() => {
       this.setState({
         data: [
           {
@@ -55,8 +61,33 @@ class Badges extends React.Component {
           },
         ],
       })
-    }, 3000);
+    }, 3000); */
   }
+
+  fetchCharacters = async () => {
+    this.setState({loading:true, error: null});
+    try {
+      const response = await fetch(
+        `https://rickandmortyapi.com/api/character/?page=${this.state.nextPage}/`
+      );
+      const data = await response.json();
+
+      this.setState({
+        loading: false,
+        data: data,
+        nextPage: this.state.nextPage++,
+      })
+
+      console.log(data);
+
+    } catch (error) {
+     this.setState({
+       loading: false,
+       error: error
+     })
+    } 
+  }
+
 
   componentDidUpdate(prevProps, prevState) {
     console.log(`5. componentDidUpdate()`);
@@ -73,7 +104,7 @@ class Badges extends React.Component {
 
   componentWillUnmount() {
     console.log(`6. componentWillUnMount()`);
-    clearTimeout(this.timeOutId);   //Liberamos memoria al cerrar la función acincrona cuando el componente sale de escena
+    /* clearTimeout(this.timeOutId); */   //Liberamos memoria al cerrar la función acincrona cuando el componente sale de escena
   }
 
   render() {
@@ -98,7 +129,30 @@ class Badges extends React.Component {
               New Badge
             </Link>
           </div>
-          <BadgesList badges={this.state.data} />
+          {/* {<BadgesList badges={this.state.data.results.map} />} */}
+          <ul className="row">
+            {this.state.data.results.map( character => (
+              <li className="col-12" key={character.id}>
+                <div className="BadgesListItem">
+                  <img
+                    className="BadgesListItem__avatar"
+                    src={character.image}
+                    alt={`${character.name}`}
+                  />
+
+                  <div>
+                    <strong>
+                      {character.name}
+                    </strong>
+                    <br />@{character.status}
+                    <br />
+                    {character.gender}
+                  </div>
+                </div>
+              </li>
+            ))}
+
+          </ul>
         </div>
       </React.Fragment>
     );
