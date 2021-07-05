@@ -42,7 +42,7 @@ class BadgesList extends React.Component {
       <div className="BadgesList">
         <ul className="list-unstyled">
           {
-            this.props.badges.reverse().map(badge => {
+            this.props.badges.map(badge => {
               return (
                 <li key={badge.id}>
                   <Link className="text-reset text-decoration-none" to={`/badges/${badge.id}/edit`}>
